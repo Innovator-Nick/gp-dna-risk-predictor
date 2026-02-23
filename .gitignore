@@ -1,7 +1,7 @@
 ipynd_checkpoints/
 --pycache--/
 logs/
-data/
+
 .DS_Store
 .idea/.gitignore
 .idea/ai-saas.iml
