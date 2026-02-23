@@ -3,6 +3,12 @@ ipynd_checkpoints/
 logs/
 data/
 .DS_Store
+.idea/.gitignore
+.idea/ai-saas.iml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/modules.xml
+ backend/__pycache__/main.cpython-311.pyc
 
 
 
