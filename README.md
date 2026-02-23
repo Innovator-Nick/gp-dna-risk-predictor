@@ -1,4 +1,4 @@
-# 🏥 NHS AI Appointment DNA Predictor
+# 🏥  GP Appointment DNA Risk Predictor
 
 
 > AI-powered system to predict GP appointment no-shows (DNAs) with 92% accuracy, helping NHS practices reduce wasted capacity and improve patient access.
@@ -59,7 +59,7 @@ Built using **real NHS appointment data patterns** and achieving **92% predictio
 | **Practice Staff** | 2-3 hours weekly managing reactive cancellations |
 | **NHS System** | £1.2bn annual loss, reduced capacity, access targets missed |
 
-![Problem Visualization](images/problem-impact.png)
+![Problem Visualization](images/problem_impact.png)
 
 ---
 
@@ -229,7 +229,7 @@ The AI considers:
 ### Clone Repository
 
 ```bash
-git clone https://github.com/innovstor-nick/gp-dna-predictor.git
+git clone https://github.com/Innovator-Nick/gp-dna-predictor.git
 cd gp-dna-predictor
 ```
 
@@ -365,7 +365,7 @@ Health check endpoint
 **Response:**
 ```json
 {
-  "message": "NHS AI DNA Prediction API",
+  "message": "GP DNA Risk Prediction API",
   "status": "running",
   "model_loaded": true
 }
@@ -430,12 +430,12 @@ Once backend is running, visit:
 | **Recall (DNA class)** | 0.72 |
 | **F1-Score** | 0.80 |
 
-![Model Performance](images/model-performance.png)
+![Model Performance](images/model_performance.png)
 
 
 ### Confusion Matrix
 
-![Confusion Matrix](images/confusion-matrix.png)
+![Confusion Matrix](images/confusion_matrix.png)
 
 ```
                  Predicted
@@ -457,7 +457,7 @@ Top predictive factors:
 7. **Appointment type** (3%)
 8. **Gender** (1%)
 
-![Feature Importance Chart](images/feature-importance.png)
+![Feature Importance Chart](images/feature_importance.png)
 
 ### ROI Validation
 
@@ -627,11 +627,11 @@ in the Software without restriction...
 **Project Maintainer:** [Innovator-Nick]
 
 
-- **LinkedIn:** [Your LinkedIn](https://www.linkedin.com/in/nick-j-ai-engineer/)
-- **GitHub:** [@yourusername](https://github.com/Innovator-Nick)
+- **LinkedIn:** https://www.linkedin.com/in/nick-j-ai-engineer/
+- **GitHub:** https://github.com/Innovator-Nick
 
 
-**Project Link:** [https://github.com/Innovator-Nick/gp-dna-risk-predictor.git(https://github.com/Innovator-Nick/gp-dna-risk-predictor.git)
+**Project Link:** https://github.com/Innovator-Nick/gp-dna-risk-predictor.git
 
 ---
 
