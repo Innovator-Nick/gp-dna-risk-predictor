@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHS AI DNA Risk Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #005EB8;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #005EB8;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #005EB8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #003087;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.low {
+            background: #E8F5E9;
+            border: 2px solid #4CAF50;
+        }
+
+        .result.medium {
+            background: #FFF3E0;
+            border: 2px solid #FF9800;
+        }
+
+        .result.high {
+            background: #FFEBEE;
+            border: 2px solid #F44336;
+        }
+
+        .probability {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .loading {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 GP DNA Risk Predictor</h1>
+            <p>Predict appointment no-show probability</p>
+        </div>
+
+        <div class="card">
+            <form id="form">
+                <div class="form-group">
+                    <label>Healthcare Professional</label>
+                    <select id="hcp_type" required>
+                        <option value="">Select...</option>
+                        <option value="GP">GP</option>
+                        <option value="Nurse">Nurse</option>
+                        <option value="Other Practice staff">Other Practice Staff</option>
+                        <option value="Mental Health">Mental Health</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Appointment Mode</label>
+                    <select id="appt_mode" required>
+                        <option value="">Select...</option>
+                        <option value="Face-to-face">Face-to-face</option>
+                        <option value="Telephone">Telephone</option>
+                        <option value="Video/Online">Video/Online</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Patient Age</label>
+                    <input type="number" id="age" min="0" max="120" value="45" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Hour (8-17)</label>
+                    <input type="number" id="hour" min="8" max="17" value="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Day of Week</label>
+                    <select id="day_of_week" required>
+                        <option value="0">Monday</option>
+                        <option value="1">Tuesday</option>
+                        <option value="2">Wednesday</option>
+                        <option value="3">Thursday</option>
+                        <option value="4">Friday</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Days Until Appointment</label>
+                    <input type="number" id="lead_time" min="0" max="60" value="7" required>
+                </div>
+
+                <button type="submit">Predict DNA Risk</button>
+            </form>
+
+            <div class="loading" id="loading">
+                <p>🔄 Analyzing...</p>
+            </div>
+
+            <div class="result" id="result">
+                <h2 id="riskLevel"></h2>
+                <div class="probability" id="probability"></div>
+                <p id="recommendation"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        document.getElementById('form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            loading.classList.add('show');
+            result.classList.remove('show');
+
+            const data = {
+                hcp_type: document.getElementById('hcp_type').value,
+                appt_mode: document.getElementById('appt_mode').value,
+                age: parseInt(document.getElementById('age').value),
+                hour: parseInt(document.getElementById('hour').value),
+                day_of_week: parseInt(document.getElementById('day_of_week').value),
+                lead_time: parseInt(document.getElementById('lead_time').value)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/predict`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const prediction = await response.json();
+
+                result.className = 'result show ' + prediction.risk_level.toLowerCase();
+                document.getElementById('riskLevel').textContent = prediction.risk_level + ' Risk';
+                document.getElementById('probability').textContent =
+                    (prediction.probability * 100).toFixed(1) + '%';
+                document.getElementById('recommendation').textContent =
+                    '💡 ' + prediction.recommendation;
+
+            } catch (err) {
+                alert('Error: Make sure backend is running on port 8000');
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

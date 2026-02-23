@@ -1,0 +1,9 @@
+ipynd_checkpoints/
+--pycache--/
+logs/
+data/
+.DS_Store
+
+
+
+
