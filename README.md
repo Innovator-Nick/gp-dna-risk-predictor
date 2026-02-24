@@ -33,7 +33,7 @@
 
 NHS England loses **£1.2 billion annually** to missed GP appointments. This AI system predicts which appointments are likely to be missed 24-48 hours in advance, enabling practices to take proactive action.
 
-Built using **real NHS appointment data patterns** and achieving **92% prediction accuracy**, this system helps GP practices:
+Built using NHS England open data  and achieving **92% prediction accuracy**, this system helps GP practices:
 - Reduce DNA rates by **15-25%**
 - Recover **500+ appointment slots annually** per practice
 - Save **£15,000-30,000** per year in wasted capacity
@@ -481,7 +481,7 @@ Top predictive factors:
 
 ### Data Source
 
-Training data based on **real NHS appointment statistics** from:
+Training data based on **real NHS appointment statistics** from: (Contains information from NHS England, licensed under the Open Government Licence v3.0)
 - NHS Digital Appointments in General Practice (December 2025)
 - Published research on DNA patterns
 - NHS operational data
