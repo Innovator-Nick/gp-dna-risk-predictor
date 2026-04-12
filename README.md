@@ -448,14 +448,12 @@ Actual  Attend   920     8
 
 Top predictive factors:
 
-1. **Previous DNA history** (28%)
-2. **Booking lead time** (22%)
-3. **Patient age** (18%)
-4. **Deprivation index** (15%)
-5. **Hour of day** (8%)
-6. **Day of week** (5%)
-7. **Appointment type** (3%)
-8. **Gender** (1%)
+1. **Booking lead time** (22%)
+2. **Patient age** (18%)
+3. **Hour of day** (8%)
+4. **Day of week** (5%)
+5. **Appointment type** (3%)
+6. **Gender** (1%)
 
 ![Feature Importance Chart](images/feature_importance.png)
 
