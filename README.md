@@ -453,7 +453,7 @@ Top predictive factors:
 3. **Hour of day** (8%)
 4. **Day of week** (5%)
 5. **Appointment type** (3%)
-6. **Gender** (1%)
+
 
 ![Feature Importance Chart](images/feature_importance.png)
 
