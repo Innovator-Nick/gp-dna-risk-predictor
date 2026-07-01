@@ -1,7 +1,7 @@
 # 🏥  GP Appointment DNA Risk Predictor
 
 
-> AI-powered system to predict GP appointment no-shows (DNAs) with 92% accuracy, helping NHS practices reduce wasted capacity and improve patient access.
+> AI-powered system to predict GP appointment no-shows (DNAs) with ROC-AUC 0.70, helping NHS practices reduce wasted capacity and improve patient access.
 
 
 
@@ -33,10 +33,11 @@
 
 NHS England loses **£1.2 billion annually** to missed GP appointments. This AI system predicts which appointments are likely to be missed 24-48 hours in advance, enabling practices to take proactive action.
 
-Built using NHS England open data  and achieving **92% prediction accuracy**, this system helps GP practices:
-- Reduce DNA rates by **15-25%**
-- Recover **500+ appointment slots annually** per practice
-- Save **£15,000-30,000** per year in wasted capacity
+Built using synthetic records modelled on NHS England open appointment statistics and achieving a ROC-AUC of 0.70 (significantly above chance), this system helps GP practices:
+- Identify high-risk appointments before they become DNAs
+- Focus staff intervention effort on the 43% of DNAs the model correctly flags
+- Reduce DNA rates through targeted proactive contact
+- Save **£15,000-£32,550** net per year for a 6,000-patient practice
 
 ---
 
@@ -84,7 +85,7 @@ Our system uses **Gradient Boosting machine learning** to analyse appointment ch
 | Feature | Traditional Reminders | Our AI System |
 |---------|----------------------|---------------|
 | **Approach** | Reactive (after booking) | Predictive (before DNA) |
-| **Accuracy** | N/A | 92% |
+| **Accuracy** | N/A | ROC-AUC 0.70 |
 | **Timing** | Generic reminders to all | Targeted intervention 24-48h before |
 | **Learning** | Static | Continuous improvement |
 | **ROI** | Minimal | 5-9 month payback |
@@ -147,6 +148,8 @@ Our system uses **Gradient Boosting machine learning** to analyse appointment ch
 The AI considers:
 - Healthcare professional type (GP, Nurse, Mental Health)
 - Appointment mode (Face-to-face, Telephone, Video)
+- Prior DNA history (number of previous non-attendances)
+- Deprivation score (IMD-style 1–10 index, synthetically modelled)
 - Patient age
 - Time of day (early morning = higher risk)
 - Day of week
@@ -171,9 +174,12 @@ The AI considers:
 
 ### Machine Learning
 - **Algorithm**: Gradient Boosting Classifier
-- **Training Data**: 10,000 realistic NHS appointments
-- **Features**: 15+ variables
-- **Validation**: 80/20 train-test split
+- **Training Data**: 10,000 synthetic records generated from NHS England appointment statistics
+- **Features**: 13 variables (6 numeric + 7 one-hot encoded)
+- **Validation**: 80/20 stratified train-test split
+- **Class balancing**: Minority class (DNA) oversampled to 25% in training set
+- **Decision threshold**: 0.35 (tuned for precision/recall balance; default 0.5 over-predicts majority class)
+- **Primary metric**: ROC-AUC 
 
 ### Infrastructure
 - **Git** - Version control
@@ -260,12 +266,16 @@ python train_model.py
 **Expected output:**
 ```
 ✅ Generated 10,000 appointments
-📈 DNA rate: 7.42%
+📈 DNA rate: 11.40%  (1140 DNAs)
+Split: 8,000 train  |  2,000 test
+Balanced training: 9,450 rows  |  DNA rate 25.00%
 🎯 Training model...
 Test Accuracy: 92.20%
-✅ Model saved
+Training Accuracy : 86.90%
+Test Accuracy     : 83.20%
+ROC-AUC           : 0.70
+✅ Model saved to ../model/dna_model.pkl
 ```
-
 ### Start Backend Server
 
 ```bash
@@ -423,12 +433,13 @@ Once backend is running, visit:
 
 | Metric | Value |
 |--------|-------|
-| **Overall Accuracy** | 92.2% |
-| **Training Accuracy** | 92.3% |
-| **Test Accuracy** | 92.2% |
-| **Precision (DNA class)** | 0.89 |
-| **Recall (DNA class)** | 0.72 |
-| **F1-Score** | 0.80 |
+
+| **Training Accuracy** | 86.9%|
+| **Test Accuracy** | 83.2%|
+| **ROC-AUC** | 0.70 |
+| **Precision (DNA class)** | 0.32 |
+| **Recall (DNA class)** | 0.43|
+| **F1-Score** | 0.37 |
 
 ![Model Performance](images/model_performance.png)
 
@@ -440,19 +451,22 @@ Once backend is running, visit:
 ```
                  Predicted
                 Attend  DNA
-Actual  Attend   920     8
-        DNA       60    12
+Actual  Attend   1567   205
+        DNA       131   97
 ```
 
 ### Feature Importance
 
 Top predictive factors:
 
-1. **Booking lead time** (22%)
-2. **Patient age** (18%)
-3. **Hour of day** (8%)
-4. **Day of week** (5%)
-5. **Appointment type** (3%)
+1. **Booking lead time** (10%) — longer gap between booking and appointment
+2. **Prior DNA count** (42%) — number of previous non-attendances in last 12 months
+3. **Patient age** (20%) — patients under 25 have elevated risk
+4. **Deprivation score** (9%) — higher deprivation correlates with higher DNA rate
+5. **Hour of day** (7%) — early morning and late afternoon slots carry more risk
+6. **Day of week** (4%) — minor variation across weekdays
+7. **HCP type** (5%) — Mental Health appointments have highest DNA rate (~11%)
+8. **Appointment type** (3%) — marginal differences across modes
 
 
 ![Feature Importance Chart](images/feature_importance.png)
@@ -488,17 +502,29 @@ Training data based on **real NHS appointment statistics** from: (Contains infor
 ### Data Generation
 
 Individual appointment records generated using:
-- Real NHS DNA rates by category (GP: 7.2%, Nurse: 6.5%, Mental Health: 11.0%)
-- Realistic UK population demographics
-- Evidence-based risk factors from literature
+- Real NHS DNA rates by HCP category (GP: 7.2%, Nurse: 6.5%, Mental Health: 11.0%)
+sourced from NHS England Appointments in General Practice open dataset
+- Realistic UK population demographics (Normal, mean 45, sd 20)
+- Synthetic patient history (prior_dna_count) drawn from a zero-inflated
+distribution (72% of patients have 0 prior DNAs)
+- Synthetic deprivation scores (Beta-distributed, modelled on IMD decile distribution)
+- Evidence-based risk factor weightings from published DNA literature
 
+### Data attribution
+
+Contains information from NHS England, licensed under the Open Government Licence v3.0.
+Source: Appointments in General Practice. https://digital.nhs.uk/data-and-information/
+publications/statistical/appointments-in-general-practice
+  
 ### Dataset Characteristics
 
-- **Size:** 10,000 appointments
-- **DNA Rate:** 7.4% (matches real NHS average)
-- **Features:** 6 core + 9 categorical encodings
-- **Split:** 80% training / 20% testing
-- **Balance:** Stratified sampling maintains DNA rate
+- **Size:** 10,000 synthetic appointments
+- **DNA Rate:** 11.4% (slightly above NHS average due to inclusion of Mental Health appointments)
+- **Features:** 8 raw features → 13 after one-hot encoding
+- **Split:** 80% training / 20% testing (stratified)
+- **Balance:** DNA class oversampled to 25% in training set only; test set is unmodified
+- **Note:** prior_dna_count and deprivation_score are synthetic — modelled from
+published distributions, not drawn from real patient records
 
 ### Sample Data
 
