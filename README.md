@@ -127,7 +127,7 @@ Our system uses **Gradient Boosting machine learning** to analyse appointment ch
 
 ### Core Functionality
 
-- ✅ **92% Prediction Accuracy** - Validated on realistic NHS data
+- ✅ **86.9% Prediction Accuracy** - Validated on realistic NHS data
 - ✅ **Real-time Risk Assessment** - Instant predictions via API
 - ✅ **Three Risk Levels** - Low (<8%), Medium (8-15%), High (>15%)
 - ✅ **Actionable Recommendations** - Specific intervention strategies
